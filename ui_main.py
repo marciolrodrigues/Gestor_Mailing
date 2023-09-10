@@ -99,12 +99,64 @@ class Ui_MainWindow(object):
         self.horizontalLayout = QHBoxLayout(self.fr_principal)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.tb_clientes = QTableWidget(self.fr_principal)
-        if (self.tb_clientes.columnCount() < 2):
-            self.tb_clientes.setColumnCount(2)
+        if (self.tb_clientes.columnCount() < 28):
+            self.tb_clientes.setColumnCount(28)
         __qtablewidgetitem = QTableWidgetItem()
         self.tb_clientes.setHorizontalHeaderItem(0, __qtablewidgetitem)
         __qtablewidgetitem1 = QTableWidgetItem()
         self.tb_clientes.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem2 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        __qtablewidgetitem4 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(4, __qtablewidgetitem4)
+        __qtablewidgetitem5 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(5, __qtablewidgetitem5)
+        __qtablewidgetitem6 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(6, __qtablewidgetitem6)
+        __qtablewidgetitem7 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(7, __qtablewidgetitem7)
+        __qtablewidgetitem8 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(8, __qtablewidgetitem8)
+        __qtablewidgetitem9 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(9, __qtablewidgetitem9)
+        __qtablewidgetitem10 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(10, __qtablewidgetitem10)
+        __qtablewidgetitem11 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(11, __qtablewidgetitem11)
+        __qtablewidgetitem12 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(12, __qtablewidgetitem12)
+        __qtablewidgetitem13 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(13, __qtablewidgetitem13)
+        __qtablewidgetitem14 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(14, __qtablewidgetitem14)
+        __qtablewidgetitem15 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(15, __qtablewidgetitem15)
+        __qtablewidgetitem16 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(16, __qtablewidgetitem16)
+        __qtablewidgetitem17 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(17, __qtablewidgetitem17)
+        __qtablewidgetitem18 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(18, __qtablewidgetitem18)
+        __qtablewidgetitem19 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(19, __qtablewidgetitem19)
+        __qtablewidgetitem20 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(20, __qtablewidgetitem20)
+        __qtablewidgetitem21 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(21, __qtablewidgetitem21)
+        __qtablewidgetitem22 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(22, __qtablewidgetitem22)
+        __qtablewidgetitem23 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(23, __qtablewidgetitem23)
+        __qtablewidgetitem24 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(24, __qtablewidgetitem24)
+        __qtablewidgetitem25 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(25, __qtablewidgetitem25)
+        __qtablewidgetitem26 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(26, __qtablewidgetitem26)
+        __qtablewidgetitem27 = QTableWidgetItem()
+        self.tb_clientes.setHorizontalHeaderItem(27, __qtablewidgetitem27)
         self.tb_clientes.setObjectName(u"tb_clientes")
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -112,6 +164,17 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.tb_clientes.sizePolicy().hasHeightForWidth())
         self.tb_clientes.setSizePolicy(sizePolicy)
         self.tb_clientes.setMaximumSize(QSize(16777215, 16777215))
+        self.tb_clientes.setStyleSheet(u"\n"
+"QHeaderView::section {\n"
+"background-color: rgb(148, 148, 148);\n"
+"	color: rgb(255, 255, 255);\n"
+" }\n"
+"\n"
+"QTableWidget{\n"
+"	\n"
+"	background-color: rgb(252, 252, 252);\n"
+"\n"
+"}")
 
         self.horizontalLayout.addWidget(self.tb_clientes)
 
@@ -194,9 +257,61 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Gestor de Mailing", None))
         self.lbl_titulo.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:16pt; font-weight:600;\">Gestor de Mailing</span></p></body></html>", None))
         ___qtablewidgetitem = self.tb_clientes.horizontalHeaderItem(0)
-        ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"CNPJ", None));
+        ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"abertura", None));
         ___qtablewidgetitem1 = self.tb_clientes.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"NOME", None));
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"situacao", None));
+        ___qtablewidgetitem2 = self.tb_clientes.horizontalHeaderItem(2)
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"tipo", None));
+        ___qtablewidgetitem3 = self.tb_clientes.horizontalHeaderItem(3)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"nome", None));
+        ___qtablewidgetitem4 = self.tb_clientes.horizontalHeaderItem(4)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"porte", None));
+        ___qtablewidgetitem5 = self.tb_clientes.horizontalHeaderItem(5)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"natureza_juridica", None));
+        ___qtablewidgetitem6 = self.tb_clientes.horizontalHeaderItem(6)
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"atividade_principal_list", None));
+        ___qtablewidgetitem7 = self.tb_clientes.horizontalHeaderItem(7)
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"atividades_secundarias_list", None));
+        ___qtablewidgetitem8 = self.tb_clientes.horizontalHeaderItem(8)
+        ___qtablewidgetitem8.setText(QCoreApplication.translate("MainWindow", u"qsa_list", None));
+        ___qtablewidgetitem9 = self.tb_clientes.horizontalHeaderItem(9)
+        ___qtablewidgetitem9.setText(QCoreApplication.translate("MainWindow", u"logradouro", None));
+        ___qtablewidgetitem10 = self.tb_clientes.horizontalHeaderItem(10)
+        ___qtablewidgetitem10.setText(QCoreApplication.translate("MainWindow", u"numero", None));
+        ___qtablewidgetitem11 = self.tb_clientes.horizontalHeaderItem(11)
+        ___qtablewidgetitem11.setText(QCoreApplication.translate("MainWindow", u"municipio", None));
+        ___qtablewidgetitem12 = self.tb_clientes.horizontalHeaderItem(12)
+        ___qtablewidgetitem12.setText(QCoreApplication.translate("MainWindow", u"bairro", None));
+        ___qtablewidgetitem13 = self.tb_clientes.horizontalHeaderItem(13)
+        ___qtablewidgetitem13.setText(QCoreApplication.translate("MainWindow", u"uf", None));
+        ___qtablewidgetitem14 = self.tb_clientes.horizontalHeaderItem(14)
+        ___qtablewidgetitem14.setText(QCoreApplication.translate("MainWindow", u"cep", None));
+        ___qtablewidgetitem15 = self.tb_clientes.horizontalHeaderItem(15)
+        ___qtablewidgetitem15.setText(QCoreApplication.translate("MainWindow", u"email", None));
+        ___qtablewidgetitem16 = self.tb_clientes.horizontalHeaderItem(16)
+        ___qtablewidgetitem16.setText(QCoreApplication.translate("MainWindow", u"telefone", None));
+        ___qtablewidgetitem17 = self.tb_clientes.horizontalHeaderItem(17)
+        ___qtablewidgetitem17.setText(QCoreApplication.translate("MainWindow", u"data_situacao", None));
+        ___qtablewidgetitem18 = self.tb_clientes.horizontalHeaderItem(18)
+        ___qtablewidgetitem18.setText(QCoreApplication.translate("MainWindow", u"cnpj", None));
+        ___qtablewidgetitem19 = self.tb_clientes.horizontalHeaderItem(19)
+        ___qtablewidgetitem19.setText(QCoreApplication.translate("MainWindow", u"ultima_atualizacao", None));
+        ___qtablewidgetitem20 = self.tb_clientes.horizontalHeaderItem(20)
+        ___qtablewidgetitem20.setText(QCoreApplication.translate("MainWindow", u"status", None));
+        ___qtablewidgetitem21 = self.tb_clientes.horizontalHeaderItem(21)
+        ___qtablewidgetitem21.setText(QCoreApplication.translate("MainWindow", u"fantasia", None));
+        ___qtablewidgetitem22 = self.tb_clientes.horizontalHeaderItem(22)
+        ___qtablewidgetitem22.setText(QCoreApplication.translate("MainWindow", u"complemento", None));
+        ___qtablewidgetitem23 = self.tb_clientes.horizontalHeaderItem(23)
+        ___qtablewidgetitem23.setText(QCoreApplication.translate("MainWindow", u"efr", None));
+        ___qtablewidgetitem24 = self.tb_clientes.horizontalHeaderItem(24)
+        ___qtablewidgetitem24.setText(QCoreApplication.translate("MainWindow", u"motivo_situacao", None));
+        ___qtablewidgetitem25 = self.tb_clientes.horizontalHeaderItem(25)
+        ___qtablewidgetitem25.setText(QCoreApplication.translate("MainWindow", u"situacao_especial", None));
+        ___qtablewidgetitem26 = self.tb_clientes.horizontalHeaderItem(26)
+        ___qtablewidgetitem26.setText(QCoreApplication.translate("MainWindow", u"data_situacao_especial", None));
+        ___qtablewidgetitem27 = self.tb_clientes.horizontalHeaderItem(27)
+        ___qtablewidgetitem27.setText(QCoreApplication.translate("MainWindow", u"capital_social", None));
         self.bt_checar.setText(QCoreApplication.translate("MainWindow", u"CHECAR ARQUIVO", None))
         self.bt_extrair.setText(QCoreApplication.translate("MainWindow", u"EXTRAIR DADOS", None))
         self.bt_exportar.setText(QCoreApplication.translate("MainWindow", u"EXPORTAR PARA EXCEL", None))
