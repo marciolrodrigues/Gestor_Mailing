@@ -1,11 +1,12 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem
 from ui_main import Ui_MainWindow
-from utils import calcula_tempo
+from utils import calcula_tempo, consulta_planilha, atualiza_planilha
 from database import DataBase
 from ui_functions import extrair_clientes
 from time import sleep
 import pandas as pd
 import sys
+import datetime
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -16,6 +17,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bt_extrair.clicked.connect(self.extracao)
         self.bt_exportar.clicked.connect(self.gerar_excel)
         self.buscar_empresas()
+
+        data_atual = datetime.datetime.now()
+        data_limite = datetime.datetime(2023, 9, 30)
+        if data_atual <= data_limite:
+            pass
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle('PROGRAMA EXPIRADO')
+            msg.setText('O perído de testes expirou, faça contato com o desenvolvedor!')
+            msg.exec()
+            exit(0)
 
     def buscar_empresas(self):
         db = DataBase()
@@ -40,9 +53,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # CADASTRAR NO BANCO DE DADOS
         self.statusbar.showMessage('Gravando no banco de dados...')
         QApplication.processEvents()
-        resp = db.register_company(lista_cadastro)
+        db.register_company(lista_cadastro)
 
         db.close_connection()
+        self.buscar_empresas()
 
         # if resp == "OK":
         #     msg = QMessageBox()
@@ -88,8 +102,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         msg.exec()
 
     def consulta_base(self):
-        clientes_df = pd.read_excel('base_cnpj.xlsx', sheet_name='cnpjs')
-        lista_clientes = clientes_df['CNPJ'].astype(str).str.zfill(14).tolist()
+        lista_clientes, list_ja_processado = consulta_planilha()
+        if lista_clientes == 'sem_coluna':
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle('PLANILHA')
+            msg.setText('Não foi encontrada a coluna com nome de "CNPJ" na planilha "base_cnpj.xlsx" !')
+            msg.exec()
+            return
+        if len(lista_clientes) == 0:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle('PLANILHA')
+            msg.setText('Não foram encontrados novos CNPJs para consultar na planilha "base_cnpj.xlsx" !')
+            msg.exec()
+            return
         tempo_extracao = (len(lista_clientes) / 3) - 1
         self.lbl_infos.setText(f'-> O arquivo possui {str(len(lista_clientes))} CNPJ(s)\n'
                                f'-> O processo vai demorar cerca de {tempo_extracao:,.0f} minuto(s)\n'
@@ -97,28 +124,40 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                f'{calcula_tempo(lista_clientes)}hs')
 
     def extracao(self):
-        clientes_df = pd.read_excel('base_cnpj.xlsx', sheet_name='cnpjs')
-        lista_cnpj = clientes_df['CNPJ'].astype(str).str.zfill(14).tolist()
+        lista_cnpj, resultado_final = consulta_planilha()
+        if lista_cnpj == 'sem_coluna':
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle('PLANILHA')
+            msg.setText('Não foi encontrada a coluna com nome de "CNPJ" na planilha "base_cnpj.xlsx" !')
+            msg.exec()
+            return
+        if len(lista_cnpj) == 0:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle('PLANILHA')
+            msg.setText('Não foram encontrados novos CNPJs para consultar na planilha "base_cnpj.xlsx" !')
+            msg.exec()
+            return
+
         min_totais = (len(lista_cnpj) / 3) - 1
         qtde_cnpjs = len(lista_cnpj)
-
-        self.lbl_infos.setText(f'Iniciando o processo de extração de {qtde_cnpjs} clientes.\n'
-                               f'O processo deve demorar cerca de {min_totais} minutos.\n'
-                               f'Previsão de término: {calcula_tempo(lista_cnpj)}hs')
-        QApplication.processEvents()
 
         envio = []
         contador = 0
         lista_final = []
-        resultado_final = []
+        # resultado_final = []
 
         for item in lista_cnpj:
             envio.append(item)
             contador += 1
             if contador % 3 == 0 or contador == qtde_cnpjs:
-                self.lbl_infos.setText(f'Solicitando consulta dos clientes de '
+                self.lbl_infos.setText(f'Iniciado o processo de extração de {qtde_cnpjs} clientes.\n\n'
+                                       f'O processo deve demorar cerca de {round(min_totais)} minutos.\n\n'
+                                       f'Solicitando consulta dos clientes de\n'
                                        f'{contador - 3 if contador % 3 == 0 else contador - contador % 3} à {contador} '
-                                       f'de um total de {qtde_cnpjs}!')
+                                       f'de um total de {qtde_cnpjs}!\n\n'
+                                       f'Previsão de término: {calcula_tempo(lista_cnpj, contador)}hs')
                 self.statusbar.showMessage('Consultando Base da Receita..')
                 QApplication.processEvents()
                 retorno_extracao = extrair_clientes(envio)
@@ -135,6 +174,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     lista_extraida, resultado_extracao = retorno_extracao
                     lista_final = lista_final + lista_extraida
                     resultado_final = resultado_final + resultado_extracao
+                    for empresa in lista_extraida:
+                        self.cadastrar_empresas(empresa)
+                    atualiza_planilha(resultado_final)
 
                     if contador < qtde_cnpjs:
                         self.statusbar.showMessage('Aguardando 1 minuto até a próxima consulta')
@@ -145,10 +187,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for sublista in resultado_final:
             qtde_erros += sublista.count('CNPJ inválido')
 
-        for item in lista_final:
-            self.cadastrar_empresas(item)
-
-        self.buscar_empresas()
+        # for item in lista_final:
+        #     self.cadastrar_empresas(item)
+        #
+        # self.buscar_empresas()
 
         self.lbl_infos.setText(f'Extração finalizada com sucesso\n{qtde_erros} CNPJ(s) deram erro na extração')
         self.statusbar.showMessage('Pronto!')
