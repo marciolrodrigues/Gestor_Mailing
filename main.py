@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem
 from ui_main import Ui_MainWindow
-from utils import calcula_tempo, consulta_planilha, atualiza_planilha
+from utils import calcula_tempo, consulta_planilha, atualiza_planilha, tempo_espera
 from database import DataBase
 from ui_functions import extrair_clientes
 from time import sleep
@@ -161,6 +161,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.statusbar.showMessage('Consultando Base da Receita..')
                 QApplication.processEvents()
                 retorno_extracao = extrair_clientes(envio)
+                tempo_inicio = datetime.datetime.now()
                 if type(retorno_extracao) == int:  # verifica se o retorno da API é um erro (time out ou + de 3 consultas)
                     self.tb_clientes.clearContents()
                     msg = QMessageBox()
@@ -179,9 +180,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     atualiza_planilha(resultado_final)
 
                     if contador < qtde_cnpjs:
-                        self.statusbar.showMessage('Aguardando 1 minuto até a próxima consulta')
+                        self.statusbar.showMessage(f'Aguardando {tempo_espera(tempo_inicio)} segundos até a '
+                                                   f'próxima consulta')
                         QApplication.processEvents()
-                        sleep(60)
+                        sleep(tempo_espera(tempo_inicio))
                         envio = []
         qtde_erros = 0
         for sublista in resultado_final:
