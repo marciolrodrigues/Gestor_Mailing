@@ -85,11 +85,11 @@ class DataBase:
         except:
             pass
 
-    def delete_companies(self, id):
+    def delete_companies(self):
 
         try:
             cursor = self.connection.cursor()
-            cursor.execute(f"DELETE FROM Empresas WHERE CNPJ = '{id}' ")
+            cursor.execute(f"DELETE FROM Empresas")
 
             self.connection.commit()
 

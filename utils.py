@@ -39,12 +39,6 @@ def atualiza_planilha(lista_cnpj):
     clientes_df['CNPJ'] = clientes_df['CNPJ'].astype(str).str.zfill(14)
     if 'STATUS' not in clientes_df.columns:
         clientes_df.insert(clientes_df.columns.get_loc('CNPJ') + 1, 'STATUS', None)
-    # for item in lista_cnpj:
-    #     if clientes_df.loc[clientes_df['CNPJ'] == item[0]]:
-    #         print('Achou')
-    #     clientes_df.loc[clientes_df['CNPJ'] == item[0], 'STATUS'] = item[1]
-
-    # clientes_df['CNPJ'] = clientes_df['CNPJ'].apply(numero_para_texto_cnpj)
     dict_clientes = dict(lista_cnpj)
     dict_clientes = {chave.zfill(14): valor for chave, valor in dict_clientes.items()}
 

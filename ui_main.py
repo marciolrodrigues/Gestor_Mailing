@@ -205,6 +205,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addWidget(self.bt_exportar)
 
+        self.bt_excluir = QPushButton(self.fr_botoes)
+        self.bt_excluir.setObjectName(u"bt_excluir")
+        self.bt_excluir.setStyleSheet(u"background-color: rgb(255, 255, 255);")
+
+        self.verticalLayout_3.addWidget(self.bt_excluir)
+
         self.fr_info_tabela = QFrame(self.fr_botoes)
         self.fr_info_tabela.setObjectName(u"fr_info_tabela")
         self.fr_info_tabela.setFrameShape(QFrame.StyledPanel)
@@ -315,6 +321,7 @@ class Ui_MainWindow(object):
         self.bt_checar.setText(QCoreApplication.translate("MainWindow", u"CHECAR ARQUIVO", None))
         self.bt_extrair.setText(QCoreApplication.translate("MainWindow", u"EXTRAIR DADOS", None))
         self.bt_exportar.setText(QCoreApplication.translate("MainWindow", u"EXPORTAR PARA EXCEL", None))
+        self.bt_excluir.setText(QCoreApplication.translate("MainWindow", u"EXCLUIR DADOS", None))
         self.lbl_infos.setText("")
     # retranslateUi
 

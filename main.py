@@ -16,6 +16,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bt_checar.clicked.connect(self.consulta_base)
         self.bt_extrair.clicked.connect(self.extracao)
         self.bt_exportar.clicked.connect(self.gerar_excel)
+        self.bt_excluir.clicked.connect(self.deletar_base)
         self.buscar_empresas()
 
         data_atual = datetime.datetime.now()
@@ -164,13 +165,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 tempo_inicio = datetime.datetime.now()
                 if type(retorno_extracao) == int:  # verifica se o retorno da API é um erro (time out ou + de 3 consultas)
                     self.tb_clientes.clearContents()
+                    self.statusbar.showMessage('Não se passou ao menos 1 minuto desde a última consulta!')
+                    QApplication.processEvents()
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Information)
                     msg.setWindowTitle("Aguardar")
                     msg.setText("Aguarde 1 minuto para efetuar uma nova consulta!")
                     msg.exec()
-                    self.statusbar.showMessage('Não se passou ao menos 1 minuto desde a última consulta!')
                     return
+                elif retorno_extracao == 'internet':  # verifica se o retorno foi erro com a conexão
+                    self.tb_clientes.clearContents()
+                    self.statusbar.showMessage('Não foi possível efetuar a consulta por problemas com a internet!')
+                    QApplication.processEvents()
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Information)
+                    msg.setWindowTitle("SEM CONEXÃO")
+                    msg.setText("Verifique sua conexão com a intenet. Sem comunicação com o servidor!")
+                    msg.exec()
                 else:  # se o retorno for o resultado da consulta
                     lista_extraida, resultado_extracao = retorno_extracao
                     lista_final = lista_final + lista_extraida
@@ -196,6 +207,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.lbl_infos.setText(f'Extração finalizada com sucesso\n{qtde_erros} CNPJ(s) deram erro na extração')
         self.statusbar.showMessage('Pronto!')
+
+    def deletar_base(self):
+        db = DataBase()
+        db.connect()
+
+        msg = QMessageBox()
+        msg.setWindowTitle("Excluir")
+        msg.setText("Exclusão de TODA A BASE de dados já extraída!")
+        msg.setInformativeText("Você tem certeza que deseja excluir?")
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        resp = msg.exec()
+
+        if resp == QMessageBox.Yes:
+            result = db.delete_companies()
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle("EXCLUSÃO DA BASE")
+            msg.setText(result)
+            msg.exec()
+
+        self.buscar_empresas()
+
+        db.close_connection()
 
 
 if __name__ == '__main__':
