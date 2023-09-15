@@ -44,6 +44,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.tb_clientes.setItem(row, column, QTableWidgetItem(str(data)))
 
         db.close_connection()
+        self.tb_clientes.resizeColumnsToContents()
 
     def cadastrar_empresas(self, lista_cadastro):
         self.statusbar.showMessage('Conectando ao banco de dados...')
