@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem
 from ui_main import Ui_MainWindow
-from utils import calcula_tempo, consulta_planilha, atualiza_planilha, tempo_espera
+from utils import calcula_tempo, consulta_planilha, atualiza_planilha, tempo_espera, atualiza_jucesp
+from jucesp import consulta_jucesp
 from database import DataBase
 from ui_functions import extrair_clientes
 from time import sleep
@@ -13,10 +14,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
+        self.showMaximized()
         self.bt_checar.clicked.connect(self.consulta_base)
         self.bt_extrair.clicked.connect(self.extracao)
         self.bt_exportar.clicked.connect(self.gerar_excel)
         self.bt_excluir.clicked.connect(self.deletar_base)
+        self.btn_consultar.clicked.connect(self.jucesp)
         self.buscar_empresas()
 
         data_atual = datetime.datetime.now()
@@ -30,6 +33,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             msg.setText('O perído de testes expirou, faça contato com o desenvolvedor!')
             msg.exec()
             exit(0)
+
+    def jucesp(self):
+        data_inicio = self.txt_data_inicio.text()
+        data_final = self.txt_data_fim.text()
+        cidade = self.txt_cidade.toPlainText()
+        capital_min = self.txt_capital_min.toPlainText()
+        capital_max = self.txt_capital_max.toPlainText()
+        retorno_jucesp = consulta_jucesp(data_inicio, data_final, cidade, capital_min, capital_max)
+        if len(retorno_jucesp) > 0:
+            atualiza_jucesp(retorno_jucesp)
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle("CONSULTA JUCESP")
+            msg.setText(f'Foram extraídas {len(retorno_jucesp)} empresas!')
+            msg.exec()
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle("CONSULTA JUCESP")
+            msg.setText('A consulta não retornou empresas!')
+            msg.exec()
 
     def buscar_empresas(self):
         db = DataBase()
@@ -126,6 +150,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                f'{calcula_tempo(lista_clientes)}hs')
 
     def extracao(self):
+        self.tab_principal.setCurrentIndex(0)
         lista_cnpj, resultado_final = consulta_planilha()
         if lista_cnpj == 'sem_coluna':
             msg = QMessageBox()
@@ -200,11 +225,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         qtde_erros = 0
         for sublista in resultado_final:
             qtde_erros += sublista.count('CNPJ inválido')
-
-        # for item in lista_final:
-        #     self.cadastrar_empresas(item)
-        #
-        # self.buscar_empresas()
 
         self.lbl_infos.setText(f'Extração finalizada com sucesso\n{qtde_erros} CNPJ(s) deram erro na extração')
         self.statusbar.showMessage('Pronto!')

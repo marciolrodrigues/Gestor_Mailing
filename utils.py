@@ -34,6 +34,20 @@ def consulta_planilha():
         return False
 
 
+def atualiza_jucesp(lista_cnpj):
+    clientes_df = pd.read_excel('base_cnpj.xlsx', sheet_name='cnpjs')
+    lista_clientes = clientes_df.to_dict('records')
+    for item in lista_cnpj:
+        lista_clientes.append({'CNPJ': item})
+
+    clientes_df = pd.DataFrame(lista_clientes)
+
+    clientes_df['CNPJ'] = clientes_df['CNPJ'].astype(str).str.zfill(14)
+
+    with pd.ExcelWriter('base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
+        clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
+
+
 def atualiza_planilha(lista_cnpj):
     clientes_df = pd.read_excel('base_cnpj.xlsx', sheet_name='cnpjs')
     clientes_df['CNPJ'] = clientes_df['CNPJ'].astype(str).str.zfill(14)
