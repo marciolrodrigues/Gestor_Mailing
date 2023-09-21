@@ -1,6 +1,16 @@
 from time import sleep
 import datetime
 import pandas as pd
+import locale
+
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+
+def formatar_moeda_data(lista_cadastro):
+    lista_cadastro[27] = locale.currency(float(lista_cadastro[27]), grouping=True)
+    dataiso = datetime.datetime.fromisoformat(lista_cadastro[19])
+    lista_cadastro[19] = dataiso.strftime('%d/%m/%Y')
+    return lista_cadastro
 
 
 def calcula_tempo(lista_clientes, consultados=0):
@@ -19,19 +29,30 @@ def consulta_planilha():
             clientes_df.insert(clientes_df.columns.get_loc('CNPJ') + 1, 'STATUS', None)
             clientes_df['STATUS'].astype(str)
             clientes_df['CNPJ'].astype(str)
+        try:
+            notincache_df = pd.read_excel('base_cnpj.xlsx', sheet_name='notincache')
+            notincache_list = notincache_df.loc[notincache_df['STATUS'].notnull(), 'CNPJ'].astype(str).str.zfill(14).tolist()
+        except:
+            nome_aba = 'notincache'
+            nova_aba = pd.DataFrame([{'CNPJ': '', 'STATUS': ''}])
+            with pd.ExcelWriter('base_cnpj.xlsx', engine='openpyxl', mode='a') as writer:
+                nova_aba.to_excel(writer, sheet_name=nome_aba, index=False)
+            notincache_list = []
+
         clientes_df['CNPJ'] = clientes_df['CNPJ'].apply(manter_numeros)
         clientes_df['CNPJ'] = clientes_df['CNPJ'].astype(str).str.zfill(14)
         lista_clientes = clientes_df.loc[clientes_df['STATUS'].isnull(), 'CNPJ'].astype(str).str.zfill(14).tolist()
         ja_processado = clientes_df.loc[clientes_df['STATUS'].notnull()].to_dict(orient='records')
         ja_processado_list = []
+        clientes_df = clientes_df[clientes_df['STATUS'] != 'not in cache']
         with pd.ExcelWriter('base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
             clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
         for item in ja_processado:
             ja_processado_list.append([str(item['CNPJ']), item['STATUS']])
 
-        return lista_clientes, ja_processado_list
+        return lista_clientes + notincache_list, ja_processado_list
     except ValueError:
-        return False
+        return False, False
 
 
 def atualiza_jucesp(lista_cnpj):
@@ -57,13 +78,12 @@ def atualiza_planilha(lista_cnpj):
     dict_clientes = {chave.zfill(14): valor for chave, valor in dict_clientes.items()}
 
     clientes_df['STATUS'] = clientes_df['CNPJ'].map(dict_clientes)
+    notincache_df = clientes_df[clientes_df['STATUS'] == 'not in cache']
+
 
     with pd.ExcelWriter('base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
         clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
-
-
-def numero_para_texto_cnpj(numero):
-    return f'{numero:014d}'
+        notincache_df.to_excel(writer, sheet_name='notincache', index=False)
 
 
 def tempo_espera(tempo_inicio):
@@ -80,3 +100,7 @@ def manter_numeros(texto):
         return ''.join(filter(str.isdigit, texto))
     else:
         return texto
+
+
+if __name__ == '__main__':
+    print(consulta_planilha())

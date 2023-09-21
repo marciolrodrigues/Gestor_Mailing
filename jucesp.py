@@ -5,7 +5,40 @@ from selenium.webdriver.support.select import Select
 from time import sleep
 
 
-def consulta_jucesp(data_inicio, data_final, cidade, capital_min, capital_max):
+def consulta_jucesp(driver, lista_nires):
+    lista_cnpjs = []
+    driver.find_element(By.XPATH, '//*[@id="row"]/div/div/div/ul/li[1]/a').click()
+
+    for nire in lista_nires:
+        campo_digitar = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_frmBuscaSimples_txtPalavraChave"]')
+        campo_digitar.send_keys(nire)
+
+        driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_frmBuscaSimples_btPesquisar"]').click()
+
+        # confirma se já abriu a página com os dados da empresa através do campo CNPJ
+        while True:
+            try:
+                cnpj = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_frmPreVisualiza_lblCnpj"]')
+                cnpj = cnpj.text
+                break
+            except:
+                sleep(1)
+        lista_cnpjs.append(cnpj)
+
+        driver.find_element(By.XPATH, '//*[@id="row"]/div/div/div/ul/li[1]/a').click()
+
+        while True:
+            try:
+                campo_digitar = driver.find_element(By.XPATH,
+                                                    '//*[@id="ctl00_cphContent_frmBuscaSimples_txtPalavraChave"]')
+                break
+            except:
+                driver.find_element(By.XPATH, '//*[@id="row"]/div/div/div/ul/li[1]/a').click()
+    driver.close()
+    return lista_cnpjs
+
+
+def extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max):
 
     # entrar em https://www.jucesponline.sp.gov.br/BuscaAvancada.aspx?IDProduto=
     chrome_options = webdriver.ChromeOptions()
@@ -13,112 +46,120 @@ def consulta_jucesp(data_inicio, data_final, cidade, capital_min, capital_max):
     driver = webdriver.Chrome(options=chrome_options)
     driver.get('https://www.jucesponline.sp.gov.br/BuscaAvancada.aspx?IDProduto=')
 
+    lista_nires = []
+
     # preencher a data inicial, data final e cidade
 
-    lista_cnpjs = []
     if data_inicio:
         campo_inicio = driver.find_element(By.XPATH,
                                            '//input[@id="ctl00_cphContent_frmBuscaAvancada_txtDataAberturaInicio"]')
         campo_inicio.send_keys(data_inicio)
     if data_final:
-        campo_final = driver.find_element(By.XPATH, '//input[@id="ctl00_cphContent_frmBuscaAvancada_txtDataAberturaFim"]')
+        campo_final = driver.find_element(By.XPATH,
+                                          '//input[@id="ctl00_cphContent_frmBuscaAvancada_txtDataAberturaFim"]')
         campo_final.send_keys(data_final)
     if cidade:
         campo_cidade = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_frmBuscaAvancada_txtMunicipio"]')
         campo_cidade.send_keys(cidade)
     if capital_min != '':
-        campo_capital_min = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_frmBuscaAvancada_txtCapitalMin"]')
+        campo_capital_min = driver.find_element(By.XPATH,
+                                                '//*[@id="ctl00_cphContent_frmBuscaAvancada_txtCapitalMin"]')
         campo_capital_min.send_keys(capital_min)
     if capital_max != '':
-        campo_capital_max = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_frmBuscaAvancada_txtCapitalMax"]')
+        campo_capital_max = driver.find_element(By.XPATH,
+                                                '//*[@id="ctl00_cphContent_frmBuscaAvancada_txtCapitalMax"]')
         campo_capital_max.send_keys(capital_max)
 
     botao_pesquisar = driver.find_element(By.XPATH, '//input[@id="ctl00_cphContent_frmBuscaAvancada_btPesquisar"]')
     botao_pesquisar.click()
-    achou_registros_totais = True
-    while achou_registros_totais:
+
+    # resgatando a quantidade total de registros da consulta
+    while True:
         try:
             registros_totais = driver.find_element(By.XPATH,
                                                    '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblDocCount"]')
-            registros_totais = registros_totais.text
-            achou_registros_totais = False
+            break
         except:
-            sleep(5)
-    conta_pagina = 0
-    lista_nires = driver.find_elements(By.XPATH,
-                                       '//*[@id="ctl00_cphContent_gdvResultadoBusca_gdvContent"]//td[contains(@class, "item01")]')
-    ultimo_pagina_atual = driver.find_element(By.XPATH,
-                                              '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]')
+            sleep(1)
+    registros_totais = registros_totais.text
 
-    while ultimo_pagina_atual != registros_totais:
-        for nire in range(len(lista_nires)):
-            cnpj = ''
-            while cnpj == '':
-                try:
-                    lista_nires = driver.find_elements(By.XPATH,'//*[@id="ctl00_cphContent_gdvResultadoBusca_gdvContent"]//td[contains(@class, "item01")]')
-                    try:
-                        print(lista_nires[nire].text)
-                    except IndexError:
-                        driver.close()
-                        return lista_cnpjs
-                    # print(f'posição numero {nire + 1} de um total de {len(lista_nires)}')
-                    lista_nires[nire].click()
-                    sleep(2)
-                    cnpj = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_frmPreVisualiza_lblCnpj"]')
-                    cnpj = cnpj.text
-                    break
-                except:
-                    sleep(1)
-            lista_cnpjs.append(cnpj)
-            cnpj = ''
-            driver.back()
+    # resgatando a lista de itens da página atual e número do último item da página atual
+    while True:
+        try:
+            nires = driver.find_elements(By.XPATH,
+                                         '//*[@id="ctl00_cphContent_gdvResultadoBusca_gdvContent"]//td[contains(@class, "item01")]')
+            ultimo_pagina_atual = driver.find_element(By.XPATH,
+                                                      '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
+            break
+        except:
+            sleep(1)
+
+    # se tiver pelo menos 1 item listado na página, recupera os itens na lista
+    if len(nires) > 0:
+        for item in nires:
+            lista_nires.append(item.text)
+
+    # recupera a lista de nires de cada página até que chegue na última
+    while True:
+        # confirma se existe um botão próximo, se não existir, é porque já está na última pagina
+        tem_proxima_pagina = False
+        try:
+            botao_proxima_pagina = driver.find_element(By.XPATH,
+                                                       '//*[@id="ctl00_cphContent_gdvResultadoBusca_pgrGridView_btrNext_lbtText"]')
+            tem_proxima_pagina = True
+        except:
+            break
+
+        while True:
+            try:
+                pagina_antes = driver.find_element(By.XPATH,
+                                           '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
+                break
+            except:
+                sleep(1)
+
+        # se tem outra página, clica no próximo e recupera a lista de intens
+        if tem_proxima_pagina:
             while True:
                 try:
-                    valida_pagina = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_gdvResultadoBusca_gdvContent"]/tbody/tr[1]/th[1]/span').text
-                    if valida_pagina == 'NIRE':
-                        break
-                except:
-                    sleep(1)
-            for x in range(conta_pagina):
-                while True:
-                    try:
+                    botao_proxima_pagina.click()
+                    while True:
                         try:
-                            botao_proxima_pagina = driver.find_element(By.XPATH,'//*[@id="ctl00_cphContent_gdvResultadoBusca_pgrGridView_btrNext_lbtText"]')
-                        except:
+                            pagina_depois = driver.find_element(By.XPATH,
+                                                                '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
                             break
-                        pagina_antes = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
-                        botao_proxima_pagina.click()
-                        pagina_depois = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
-                        while pagina_antes == pagina_depois:
+                        except:
                             sleep(1)
-                            pagina_depois = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
-                        break
-                    except:
+                    while pagina_antes == pagina_depois:
                         sleep(1)
-            while True:
-                try:
-                    lista_nires = driver.find_elements(By.XPATH,'//*[@id="ctl00_cphContent_gdvResultadoBusca_gdvContent"]//td[contains(@class, "item01")]')
+                        pagina_depois = driver.find_element(By.XPATH,
+                                                            '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
                     break
                 except:
                     sleep(1)
-        conta_pagina += 1
+            nires = pega_nires(driver)
+            for item in nires:
+                lista_nires.append(item.text)
 
-        ultimo_pagina_atual = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]')
-        ultimo_pagina_atual = ultimo_pagina_atual.text
-        if ultimo_pagina_atual < registros_totais:
-            for x in range(conta_pagina):
-                while True:
-                    try:
-                        botao_proxima_pagina = driver.find_element(By.XPATH, '//*[@id="ctl00_cphContent_gdvResultadoBusca_pgrGridView_btrNext_lbtText"]')
-                        botao_proxima_pagina.click()
-                        break
-                    except Exception as error:
-                        print(error)
-            while True:
-                try:
-                    lista_nires = driver.find_elements(By.XPATH,'//*[@id="ctl00_cphContent_gdvResultadoBusca_gdvContent"]//td[contains(@class, "item01")]')
-                    break
-                except:
-                    sleep(1)
-    driver.close()
-    return lista_cnpjs
+    print(lista_nires)
+    print(len(lista_nires))
+    return consulta_jucesp(driver, lista_nires)
+
+
+def pega_nires(driver):
+    while True:
+        try:
+            nires = driver.find_elements(By.XPATH,
+                                         '//*[@id="ctl00_cphContent_gdvResultadoBusca_gdvContent"]//td[contains(@class, "item01")]')
+            break
+        except:
+            sleep(1)
+    return nires
+
+if __name__ == '__main__':
+    inicio = '21/09/2023'
+    fim = '21/09/2023'
+    cid = 'campinas'
+    cap_ini = ''
+    cap_fin = ''
+    extrair_nires(inicio, fim, cid, cap_ini, cap_fin)

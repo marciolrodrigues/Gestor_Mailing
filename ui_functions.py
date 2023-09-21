@@ -17,9 +17,11 @@ def extrair_clientes(lista_cnpj):
     for cliente in lista_cnpj:
         try:
             url = f"https://www.receitaws.com.br/v1/cnpj/{cliente}"
-            querystring = {"token": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX", "cnpj": "06990590000123", "plugin": "RF"}
-            response = requests.request("GET", url, params=querystring)
-        except requests.exceptions.ConnectionError:
+            headers = {"Accept": "application/json"}
+
+            response = requests.get(url, headers=headers)
+
+        except requests.exceptions.ConnectionError as erro:
             return 'internet'
 
         if response.status_code == 429:

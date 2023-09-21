@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem
 from ui_main import Ui_MainWindow
-from utils import calcula_tempo, consulta_planilha, atualiza_planilha, tempo_espera, atualiza_jucesp
-from jucesp import consulta_jucesp
+from utils import calcula_tempo, consulta_planilha, atualiza_planilha, tempo_espera, atualiza_jucesp, formatar_moeda_data
+from jucesp import extrair_nires
 from database import DataBase
 from ui_functions import extrair_clientes
 from time import sleep
@@ -11,6 +11,7 @@ import datetime
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
@@ -35,12 +36,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             exit(0)
 
     def jucesp(self):
+        self.statusbar.showMessage('Iniciando automação para consultar JUCESP')
+        QApplication.processEvents()
         data_inicio = self.txt_data_inicio.text()
         data_final = self.txt_data_fim.text()
         cidade = self.txt_cidade.toPlainText()
         capital_min = self.txt_capital_min.toPlainText()
         capital_max = self.txt_capital_max.toPlainText()
-        retorno_jucesp = consulta_jucesp(data_inicio, data_final, cidade, capital_min, capital_max)
+        retorno_jucesp = extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max)
         if len(retorno_jucesp) > 0:
             atualiza_jucesp(retorno_jucesp)
             msg = QMessageBox()
@@ -79,6 +82,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # CADASTRAR NO BANCO DE DADOS
         self.statusbar.showMessage('Gravando no banco de dados...')
         QApplication.processEvents()
+        lista_cadastro = formatar_moeda_data(lista_cadastro)
+
         db.register_company(lista_cadastro)
 
         db.close_connection()
@@ -133,7 +138,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
             msg.setWindowTitle('PLANILHA')
-            msg.setText('Não foi encontrada a coluna com nome de "CNPJ" na planilha "base_cnpj.xlsx" !')
+            msg.setText('Não foi encontrada a coluna com nome de "CNPJ" dentro de uma aba chamada "cnpjs" na planilha "base_cnpj.xlsx" !')
             msg.exec()
             return
         if len(lista_clientes) == 0:
@@ -143,7 +148,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             msg.setText('Não foram encontrados novos CNPJs para consultar na planilha "base_cnpj.xlsx" !')
             msg.exec()
             return
-        tempo_extracao = (len(lista_clientes) / 3) - 1
+        tempo_extracao = (len(lista_clientes) / 3)
         self.lbl_infos.setText(f'-> O arquivo possui {str(len(lista_clientes))} CNPJ(s)\n'
                                f'-> O processo vai demorar cerca de {tempo_extracao:,.0f} minuto(s)\n'
                                f'-> A previsão de término começando agora é para às '
@@ -187,8 +192,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                        f'Previsão de término: {calcula_tempo(lista_cnpj, contador)}hs')
                 self.statusbar.showMessage('Consultando Base da Receita..')
                 QApplication.processEvents()
-                retorno_extracao = extrair_clientes(envio)
                 tempo_inicio = datetime.datetime.now()
+                retorno_extracao = extrair_clientes(envio)
                 if type(retorno_extracao) == int:  # verifica se o retorno da API é um erro (time out ou + de 3 consultas)
                     self.tb_clientes.clearContents()
                     self.statusbar.showMessage('Não se passou ao menos 1 minuto desde a última consulta!')
@@ -220,11 +225,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         self.statusbar.showMessage(f'Aguardando {tempo_espera(tempo_inicio)} segundos até a '
                                                    f'próxima consulta')
                         QApplication.processEvents()
-                        sleep(tempo_espera(tempo_inicio))
+                        sleep(60)
                         envio = []
         qtde_erros = 0
         for sublista in resultado_final:
             qtde_erros += sublista.count('CNPJ inválido')
+            qtde_erros += sublista.count('not in cache')
 
         self.lbl_infos.setText(f'Extração finalizada com sucesso\n{qtde_erros} CNPJ(s) deram erro na extração')
         self.statusbar.showMessage('Pronto!')
