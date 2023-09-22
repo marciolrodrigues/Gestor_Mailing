@@ -15,17 +15,22 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDateEdit, QFrame, QGridLayout,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QPushButton, QSizePolicy, QSpacerItem, QStatusBar,
-    QTabWidget, QTableWidget, QTableWidgetItem, QTextEdit,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QDateEdit, QFrame,
+    QGridLayout, QHBoxLayout, QHeaderView, QLabel,
+    QMainWindow, QPushButton, QSizePolicy, QSpacerItem,
+    QStatusBar, QTabWidget, QTableWidget, QTableWidgetItem,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(920, 777)
+        MainWindow.resize(1627, 777)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -101,8 +106,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.tab_principal = QTabWidget(self.fr_principal)
         self.tab_principal.setObjectName(u"tab_principal")
+        font = QFont()
+        font.setFamilies([u"MS Shell Dlg 2"])
+        font.setPointSize(14)
+        font.setBold(False)
+        font.setItalic(False)
+        self.tab_principal.setFont(font)
+        self.tab_principal.setStyleSheet(u"")
         self.tabwid_extraidos = QWidget()
         self.tabwid_extraidos.setObjectName(u"tabwid_extraidos")
+        self.tabwid_extraidos.setStyleSheet(u"selection-color: rgb(0, 0, 255);")
         self.verticalLayout_5 = QVBoxLayout(self.tabwid_extraidos)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.tb_clientes = QTableWidget(self.tabwid_extraidos)
@@ -165,12 +178,18 @@ class Ui_MainWindow(object):
         __qtablewidgetitem27 = QTableWidgetItem()
         self.tb_clientes.setHorizontalHeaderItem(27, __qtablewidgetitem27)
         self.tb_clientes.setObjectName(u"tb_clientes")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.tb_clientes.sizePolicy().hasHeightForWidth())
-        self.tb_clientes.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.tb_clientes.sizePolicy().hasHeightForWidth())
+        self.tb_clientes.setSizePolicy(sizePolicy1)
         self.tb_clientes.setMaximumSize(QSize(16777215, 16777215))
+        font1 = QFont()
+        font1.setFamilies([u"MS Shell Dlg 2"])
+        font1.setPointSize(10)
+        font1.setBold(False)
+        font1.setItalic(False)
+        self.tb_clientes.setFont(font1)
         self.tb_clientes.setStyleSheet(u"\n"
 "QHeaderView::section {\n"
 "background-color: rgb(148, 148, 148);\n"
@@ -198,8 +217,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.fr_titulo_jucesp = QFrame(self.fr_jucesp)
         self.fr_titulo_jucesp.setObjectName(u"fr_titulo_jucesp")
-        sizePolicy.setHeightForWidth(self.fr_titulo_jucesp.sizePolicy().hasHeightForWidth())
-        self.fr_titulo_jucesp.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.fr_titulo_jucesp.sizePolicy().hasHeightForWidth())
+        self.fr_titulo_jucesp.setSizePolicy(sizePolicy1)
         self.fr_titulo_jucesp.setMinimumSize(QSize(0, 0))
         self.fr_titulo_jucesp.setFrameShape(QFrame.StyledPanel)
         self.fr_titulo_jucesp.setFrameShadow(QFrame.Raised)
@@ -207,11 +226,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.lbl_titulo_jucesp = QLabel(self.fr_titulo_jucesp)
         self.lbl_titulo_jucesp.setObjectName(u"lbl_titulo_jucesp")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.lbl_titulo_jucesp.sizePolicy().hasHeightForWidth())
-        self.lbl_titulo_jucesp.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.lbl_titulo_jucesp.sizePolicy().hasHeightForWidth())
+        self.lbl_titulo_jucesp.setSizePolicy(sizePolicy2)
         self.lbl_titulo_jucesp.setMaximumSize(QSize(16777215, 50))
         palette3 = QPalette()
         palette3.setBrush(QPalette.Active, QPalette.BrightText, brush1)
@@ -226,40 +245,36 @@ class Ui_MainWindow(object):
 
         self.fr_dados_jucesp = QFrame(self.fr_jucesp)
         self.fr_dados_jucesp.setObjectName(u"fr_dados_jucesp")
+        font2 = QFont()
+        font2.setFamilies([u"MS Shell Dlg 2"])
+        font2.setPointSize(12)
+        font2.setBold(False)
+        font2.setItalic(False)
+        self.fr_dados_jucesp.setFont(font2)
         self.fr_dados_jucesp.setFrameShape(QFrame.StyledPanel)
         self.fr_dados_jucesp.setFrameShadow(QFrame.Raised)
         self.gridLayout = QGridLayout(self.fr_dados_jucesp)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.verticalSpacer = QSpacerItem(20, 800, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.label_4 = QLabel(self.fr_dados_jucesp)
+        self.label_4.setObjectName(u"label_4")
 
-        self.gridLayout.addItem(self.verticalSpacer, 4, 1, 1, 1)
+        self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
 
-        self.label_2 = QLabel(self.fr_dados_jucesp)
-        self.label_2.setObjectName(u"label_2")
+        self.txt_capital_min = QTextEdit(self.fr_dados_jucesp)
+        self.txt_capital_min.setObjectName(u"txt_capital_min")
+        self.txt_capital_min.setMinimumSize(QSize(0, 40))
 
-        self.gridLayout.addWidget(self.label_2, 1, 2, 1, 1)
+        self.gridLayout.addWidget(self.txt_capital_min, 2, 1, 1, 1)
 
         self.label = QLabel(self.fr_dados_jucesp)
         self.label.setObjectName(u"label")
 
         self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
 
-        self.btn_consultar = QPushButton(self.fr_dados_jucesp)
-        self.btn_consultar.setObjectName(u"btn_consultar")
-        self.btn_consultar.setMinimumSize(QSize(0, 60))
-        font = QFont()
-        font.setPointSize(18)
-        font.setBold(True)
-        self.btn_consultar.setFont(font)
-
-        self.gridLayout.addWidget(self.btn_consultar, 3, 3, 1, 1)
-
         self.txt_data_inicio = QDateEdit(self.fr_dados_jucesp)
         self.txt_data_inicio.setObjectName(u"txt_data_inicio")
         self.txt_data_inicio.setMinimumSize(QSize(0, 40))
-        font1 = QFont()
-        font1.setPointSize(12)
-        self.txt_data_inicio.setFont(font1)
+        self.txt_data_inicio.setFont(font)
         self.txt_data_inicio.setLayoutDirection(Qt.LeftToRight)
         self.txt_data_inicio.setCalendarPopup(True)
         self.txt_data_inicio.setCurrentSectionIndex(0)
@@ -276,7 +291,7 @@ class Ui_MainWindow(object):
         self.txt_data_fim = QDateEdit(self.fr_dados_jucesp)
         self.txt_data_fim.setObjectName(u"txt_data_fim")
         self.txt_data_fim.setMinimumSize(QSize(0, 40))
-        self.txt_data_fim.setFont(font1)
+        self.txt_data_fim.setFont(font)
         self.txt_data_fim.setLayoutDirection(Qt.LeftToRight)
         self.txt_data_fim.setCalendarPopup(True)
         self.txt_data_fim.setCurrentSectionIndex(0)
@@ -284,11 +299,37 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.txt_data_fim, 1, 3, 1, 1)
 
-        self.txt_capital_min = QTextEdit(self.fr_dados_jucesp)
-        self.txt_capital_min.setObjectName(u"txt_capital_min")
-        self.txt_capital_min.setMinimumSize(QSize(0, 40))
+        self.label_2 = QLabel(self.fr_dados_jucesp)
+        self.label_2.setObjectName(u"label_2")
 
-        self.gridLayout.addWidget(self.txt_capital_min, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.label_2, 1, 2, 1, 1)
+
+        self.label_3 = QLabel(self.fr_dados_jucesp)
+        self.label_3.setObjectName(u"label_3")
+
+        self.gridLayout.addWidget(self.label_3, 1, 4, 1, 1)
+
+        self.label_5 = QLabel(self.fr_dados_jucesp)
+        self.label_5.setObjectName(u"label_5")
+
+        self.gridLayout.addWidget(self.label_5, 2, 2, 1, 1)
+
+        self.btn_consultar = QPushButton(self.fr_dados_jucesp)
+        self.btn_consultar.setObjectName(u"btn_consultar")
+        self.btn_consultar.setMinimumSize(QSize(0, 60))
+        self.btn_consultar.setFont(font)
+
+        self.gridLayout.addWidget(self.btn_consultar, 3, 3, 1, 1)
+
+        self.ch_box_pendentes = QCheckBox(self.fr_dados_jucesp)
+        self.ch_box_pendentes.setObjectName(u"ch_box_pendentes")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.ch_box_pendentes.sizePolicy().hasHeightForWidth())
+        self.ch_box_pendentes.setSizePolicy(sizePolicy3)
+
+        self.gridLayout.addWidget(self.ch_box_pendentes, 2, 4, 1, 2, Qt.AlignHCenter)
 
         self.txt_capital_max = QTextEdit(self.fr_dados_jucesp)
         self.txt_capital_max.setObjectName(u"txt_capital_max")
@@ -296,20 +337,9 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addWidget(self.txt_capital_max, 2, 3, 1, 1)
 
-        self.label_3 = QLabel(self.fr_dados_jucesp)
-        self.label_3.setObjectName(u"label_3")
+        self.verticalSpacer = QSpacerItem(20, 800, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout.addWidget(self.label_3, 1, 4, 1, 1)
-
-        self.label_4 = QLabel(self.fr_dados_jucesp)
-        self.label_4.setObjectName(u"label_4")
-
-        self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
-
-        self.label_5 = QLabel(self.fr_dados_jucesp)
-        self.label_5.setObjectName(u"label_5")
-
-        self.gridLayout.addWidget(self.label_5, 2, 2, 1, 1)
+        self.gridLayout.addItem(self.verticalSpacer, 4, 1, 1, 1)
 
 
         self.verticalLayout_7.addWidget(self.fr_dados_jucesp)
@@ -463,28 +493,29 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem27 = self.tb_clientes.horizontalHeaderItem(27)
         ___qtablewidgetitem27.setText(QCoreApplication.translate("MainWindow", u"capital_social", None));
         self.tab_principal.setTabText(self.tab_principal.indexOf(self.tabwid_extraidos), QCoreApplication.translate("MainWindow", u"Extra\u00eddos", None))
-        self.lbl_titulo_jucesp.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-size:18pt; font-weight:600; color:#0000ff;\">Informa\u00e7\u00f5es para consulta na JUCESP</span></p></body></html>", None))
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"DATA FINAL", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"DATA INCIAL:", None))
-        self.btn_consultar.setText(QCoreApplication.translate("MainWindow", u"CONSULTAR", None))
-        self.txt_cidade.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">Campinas</span></p></body></html>", None))
+        self.lbl_titulo_jucesp.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:18pt; font-weight:600; color:#0000ff;\">Informa\u00e7\u00f5es para consulta na JUCESP</span></p></body></html>", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"CAPITAL MINIMO", None))
         self.txt_capital_min.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:7.8pt;\"><br /></p></body></html>", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"DATA INCIAL:", None))
+        self.txt_cidade.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">Campinas</span></p></body></html>", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"DATA FINAL", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"CIDADE", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"CAPITAL M\u00c1XIMO", None))
+        self.btn_consultar.setText(QCoreApplication.translate("MainWindow", u"CONSULTAR", None))
+        self.ch_box_pendentes.setText(QCoreApplication.translate("MainWindow", u"Validar pendentes?", None))
         self.txt_capital_max.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"CIDADE", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"CAPITAL MINIMO", None))
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"CAPITAL M\u00c1XIMO", None))
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:7.8pt;\"><br /></p></body></html>", None))
         self.tab_principal.setTabText(self.tab_principal.indexOf(self.tabwid_jucesp), QCoreApplication.translate("MainWindow", u"JUCESP", None))
         self.bt_checar.setText(QCoreApplication.translate("MainWindow", u"CHECAR ARQUIVO", None))
         self.bt_extrair.setText(QCoreApplication.translate("MainWindow", u"EXTRAIR DADOS", None))

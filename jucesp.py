@@ -3,6 +3,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from time import sleep
+from winotify import Notification
+
+
+notificacao = Notification(app_id='Gestor de Mailing', title='Digitação do CAPTCHA',
+                           msg='Digite o CAPTCHA no navegador para continuar a extração')
 
 
 def consulta_jucesp(driver, lista_nires):
@@ -73,6 +78,8 @@ def extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max):
     botao_pesquisar = driver.find_element(By.XPATH, '//input[@id="ctl00_cphContent_frmBuscaAvancada_btPesquisar"]')
     botao_pesquisar.click()
 
+    notificacao.show()
+
     # resgatando a quantidade total de registros da consulta
     while True:
         try:
@@ -141,8 +148,6 @@ def extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max):
             for item in nires:
                 lista_nires.append(item.text)
 
-    print(lista_nires)
-    print(len(lista_nires))
     return consulta_jucesp(driver, lista_nires)
 
 

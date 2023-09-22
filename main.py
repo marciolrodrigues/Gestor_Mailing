@@ -1,9 +1,11 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem
+from PySide6.QtCore import QDate
 from ui_main import Ui_MainWindow
 from utils import calcula_tempo, consulta_planilha, atualiza_planilha, tempo_espera, atualiza_jucesp, formatar_moeda_data
 from jucesp import extrair_nires
 from database import DataBase
 from ui_functions import extrair_clientes
+from winotify import Notification
 from time import sleep
 import pandas as pd
 import sys
@@ -22,6 +24,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bt_excluir.clicked.connect(self.deletar_base)
         self.btn_consultar.clicked.connect(self.jucesp)
         self.buscar_empresas()
+        data_hoje = datetime.datetime.now()
+        data_hoje_qdate = QDate(data_hoje.year, data_hoje.month, data_hoje.day)
+        self.txt_data_inicio.setDate(data_hoje_qdate)
+        self.txt_data_fim.setDate(data_hoje_qdate)
 
         data_atual = datetime.datetime.now()
         data_limite = datetime.datetime(2023, 9, 30)
@@ -46,11 +52,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         retorno_jucesp = extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max)
         if len(retorno_jucesp) > 0:
             atualiza_jucesp(retorno_jucesp)
+            notificacao = Notification(app_id='Gestor de Mailing', title='Processo finalizado!',
+                                       msg=f'Foram extraídas {len(retorno_jucesp)} empresas!')
+            notificacao.show()
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
             msg.setWindowTitle("CONSULTA JUCESP")
             msg.setText(f'Foram extraídas {len(retorno_jucesp)} empresas!')
             msg.exec()
+
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
@@ -133,12 +143,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         msg.exec()
 
     def consulta_base(self):
-        lista_clientes, list_ja_processado = consulta_planilha()
+        lista_clientes, list_ja_processado = consulta_planilha(self.ch_box_pendentes.isChecked())
         if lista_clientes == 'sem_coluna':
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
             msg.setWindowTitle('PLANILHA')
-            msg.setText('Não foi encontrada a coluna com nome de "CNPJ" dentro de uma aba chamada "cnpjs" na planilha "base_cnpj.xlsx" !')
+            msg.setText('Não foi encontrada a coluna com nome de "CNPJ" dentro de uma aba chamada "cnpjs" na planilha '
+                        '"base_cnpj.xlsx" !')
             msg.exec()
             return
         if len(lista_clientes) == 0:
@@ -156,7 +167,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def extracao(self):
         self.tab_principal.setCurrentIndex(0)
-        lista_cnpj, resultado_final = consulta_planilha()
+        lista_cnpj, resultado_final = consulta_planilha(self.ch_box_pendentes.isChecked())
         if lista_cnpj == 'sem_coluna':
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
@@ -232,8 +243,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             qtde_erros += sublista.count('CNPJ inválido')
             qtde_erros += sublista.count('not in cache')
 
-        self.lbl_infos.setText(f'Extração finalizada com sucesso\n{qtde_erros} CNPJ(s) deram erro na extração')
+        self.lbl_infos.setText(f'Extração finalizada com sucesso\n '
+                               f'Foram extraídos {sublista.count("OK")} CNPJs com sucesso,\n'
+                               f'{sublista.count("not in cache")} não estavam na base e\n'
+                               f'{sublista.count("CNPJ inválido")} CNPJs inválidos')
         self.statusbar.showMessage('Pronto!')
+        notificacao = Notification(app_id='Gestor de Mailing', title='Processo finalizado!',
+                                   msg=f'Foram extraídos {sublista.count("OK")} CNPJs com sucesso, '
+                                       f'{sublista.count("not in cache")} não estavam na base e '
+                                       f'{sublista.count("CNPJ inválido")} CNPJs inválidos')
+        notificacao.show()
 
     def deletar_base(self):
         db = DataBase()

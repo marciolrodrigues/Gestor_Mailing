@@ -20,7 +20,7 @@ def calcula_tempo(lista_clientes, consultados=0):
     return hora_final.strftime("%H:%M")
 
 
-def consulta_planilha():
+def consulta_planilha(consulta_pendentes):
     try:
         clientes_df = pd.read_excel('base_cnpj.xlsx', sheet_name='cnpjs')
         if 'CNPJ' not in clientes_df.columns:
@@ -49,8 +49,10 @@ def consulta_planilha():
             clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
         for item in ja_processado:
             ja_processado_list.append([str(item['CNPJ']), item['STATUS']])
-
-        return lista_clientes + notincache_list, ja_processado_list
+        if consulta_pendentes:
+            return lista_clientes + notincache_list, ja_processado_list
+        else:
+            return lista_clientes, ja_processado_list
     except ValueError:
         return False, False
 
