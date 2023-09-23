@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem
 from PySide6.QtCore import QDate
 from ui_main import Ui_MainWindow
-from utils import calcula_tempo, consulta_planilha, atualiza_planilha, tempo_espera, atualiza_jucesp, formatar_moeda_data
+from utils import calcula_tempo, consulta_planilha, atualiza_planilha, atualiza_jucesp, formatar_moeda_data
 from jucesp import extrair_nires
 from database import DataBase
 from ui_functions import extrair_clientes
@@ -28,6 +28,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         data_hoje_qdate = QDate(data_hoje.year, data_hoje.month, data_hoje.day)
         self.txt_data_inicio.setDate(data_hoje_qdate)
         self.txt_data_fim.setDate(data_hoje_qdate)
+
+        self.txt_tempo.setStyleSheet('color: white;')
 
         data_atual = datetime.datetime.now()
         data_limite = datetime.datetime(2023, 9, 30)
@@ -233,26 +235,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     atualiza_planilha(resultado_final)
 
                     if contador < qtde_cnpjs:
-                        self.statusbar.showMessage(f'Aguardando {tempo_espera(tempo_inicio)} segundos até a '
-                                                   f'próxima consulta')
+                        self.statusbar.showMessage('Aguardando para efetuar a próxima consulta')
                         QApplication.processEvents()
-                        sleep(60)
+                        self.contagem()
                         envio = []
-        qtde_erros = 0
+        invalidos = 0
+        notinchache = 0
+        ok = 0
+
         for sublista in resultado_final:
-            qtde_erros += sublista.count('CNPJ inválido')
-            qtde_erros += sublista.count('not in cache')
+            notinchache += sublista.count('not in cache')
+
+        for sublista in resultado_final:
+            invalidos += sublista.count('CNPJ inválido')
+
+        for sublista in resultado_final:
+            ok += sublista.count('OK')
 
         self.lbl_infos.setText(f'Extração finalizada com sucesso\n '
-                               f'Foram extraídos {sublista.count("OK")} CNPJs com sucesso,\n'
-                               f'{sublista.count("not in cache")} não estavam na base e\n'
-                               f'{sublista.count("CNPJ inválido")} CNPJs inválidos')
+                               f'Foram extraídos {ok} CNPJs com sucesso,\n'
+                               f'{notinchache} não estavam na base e\n'
+                               f'{invalidos} CNPJs inválidos')
         self.statusbar.showMessage('Pronto!')
         notificacao = Notification(app_id='Gestor de Mailing', title='Processo finalizado!',
-                                   msg=f'Foram extraídos {sublista.count("OK")} CNPJs com sucesso, '
+                                   msg=f'Foram extraídos {resultado_final.count("OK")} CNPJs com sucesso, '
                                        f'{sublista.count("not in cache")} não estavam na base e '
                                        f'{sublista.count("CNPJ inválido")} CNPJs inválidos')
         notificacao.show()
+
+    def contagem(self):
+        tempo = 60
+        for x in range(tempo, 0, -1):
+            self.txt_tempo.setText(f'Aguardando {tempo} segundos até a '
+                                   f'próxima consulta')
+            QApplication.processEvents()
+            sleep(1)
+            tempo -= 1
+        self.txt_tempo.setText('')
 
     def deletar_base(self):
         db = DataBase()

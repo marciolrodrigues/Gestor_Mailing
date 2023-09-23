@@ -1,4 +1,3 @@
-from time import sleep
 import datetime
 import pandas as pd
 import locale
@@ -86,15 +85,6 @@ def atualiza_planilha(lista_cnpj):
     with pd.ExcelWriter('base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
         clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
         notincache_df.to_excel(writer, sheet_name='notincache', index=False)
-
-
-def tempo_espera(tempo_inicio):
-    tempo_passado = datetime.datetime.now() - tempo_inicio
-    segundos_aguardar = datetime.timedelta(seconds=60)
-    if tempo_passado > segundos_aguardar:
-        return 0
-    else:
-        return (segundos_aguardar - tempo_passado).seconds
 
 
 def manter_numeros(texto):

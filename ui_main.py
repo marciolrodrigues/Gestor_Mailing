@@ -410,6 +410,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addWidget(self.lbl_infos)
 
+        self.txt_tempo = QLabel(self.fr_info_tabela)
+        self.txt_tempo.setObjectName(u"txt_tempo")
+        self.txt_tempo.setMaximumSize(QSize(16777215, 50))
+        self.txt_tempo.setStyleSheet(u"")
+        self.txt_tempo.setWordWrap(True)
+
+        self.verticalLayout_4.addWidget(self.txt_tempo)
+
 
         self.verticalLayout_3.addWidget(self.fr_info_tabela)
 
@@ -427,7 +435,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tab_principal.setCurrentIndex(1)
+        self.tab_principal.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -522,5 +530,6 @@ class Ui_MainWindow(object):
         self.bt_exportar.setText(QCoreApplication.translate("MainWindow", u"EXPORTAR PARA EXCEL", None))
         self.bt_excluir.setText(QCoreApplication.translate("MainWindow", u"EXCLUIR DADOS", None))
         self.lbl_infos.setText("")
+        self.txt_tempo.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><br/></p></body></html>", None))
     # retranslateUi
 
