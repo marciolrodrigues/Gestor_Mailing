@@ -124,7 +124,7 @@ def extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max):
                 sleep(1)
 
         # se tem outra página, clica no próximo e recupera a lista de intens
-        if tem_proxima_pagina:
+        if tem_proxima_pagina: #TODO tem que rever isso aqui
             while True:
                 try:
                     botao_proxima_pagina.click()
