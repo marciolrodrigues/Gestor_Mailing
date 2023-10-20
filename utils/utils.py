@@ -34,7 +34,7 @@ def consulta_planilha(consulta_pendentes):
         except:
             nome_aba = 'notincache'
             nova_aba = pd.DataFrame([{'CNPJ': '', 'STATUS': ''}])
-            with pd.ExcelWriter('base_cnpj.xlsx', engine='openpyxl', mode='a') as writer:
+            with pd.ExcelWriter('../base_cnpj.xlsx', engine='openpyxl', mode='a') as writer:
                 nova_aba.to_excel(writer, sheet_name=nome_aba, index=False)
             notincache_list = []
 
@@ -44,8 +44,15 @@ def consulta_planilha(consulta_pendentes):
         ja_processado = clientes_df.loc[clientes_df['STATUS'].notnull()].to_dict(orient='records')
         ja_processado_list = []
         clientes_df = clientes_df[clientes_df['STATUS'] != 'not in cache']
-        with pd.ExcelWriter('base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
+
+        notincache_df['CNPJ'] = notincache_df['CNPJ'].astype(str).str.zfill(14)
+
+        clientes_df = clientes_df.drop_duplicates()
+        notincache_df = notincache_df.drop_duplicates()
+
+        with pd.ExcelWriter('./base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
             clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
+            notincache_df.to_excel(writer, sheet_name='notincache', index=False)
         for item in ja_processado:
             ja_processado_list.append([str(item['CNPJ']), item['STATUS']])
         if consulta_pendentes:
@@ -66,23 +73,40 @@ def atualiza_jucesp(lista_cnpj):
 
     clientes_df['CNPJ'] = clientes_df['CNPJ'].astype(str).str.zfill(14)
 
-    with pd.ExcelWriter('base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
+    with pd.ExcelWriter('./base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
         clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
 
 
-def atualiza_planilha(lista_cnpj):
+def atualiza_planilha(lista_cnpj, consulta_pendentes):
+    notincache_existente = pd.read_excel('base_cnpj.xlsx', sheet_name='notincache')
     clientes_df = pd.read_excel('base_cnpj.xlsx', sheet_name='cnpjs')
     clientes_df['CNPJ'] = clientes_df['CNPJ'].astype(str).str.zfill(14)
     if 'STATUS' not in clientes_df.columns:
         clientes_df.insert(clientes_df.columns.get_loc('CNPJ') + 1, 'STATUS', None)
-    dict_clientes = dict(lista_cnpj)
-    dict_clientes = {chave.zfill(14): valor for chave, valor in dict_clientes.items()}
+    # dict_clientes = dict(lista_cnpj)
+    # dict_clientes = {chave.zfill(14): valor for chave, valor in dict_clientes.items()}
 
-    clientes_df['STATUS'] = clientes_df['CNPJ'].map(dict_clientes)
+    # Converta a nova lista em um novo DataFrame
+    novos_dados = pd.DataFrame(lista_cnpj, columns=['CNPJ', 'STATUS'])
+
+    # # Defina o CNPJ como índice no novo DataFrame, se necessário
+    # novos_dados.set_index('CNPJ', inplace=True)
+
+    # Use a função update para substituir os valores no DataFrame original com base no novo DataFrame
+    clientes_df = novos_dados
+
+    # clientes_df['STATUS'] = clientes_df['CNPJ'].map(dict_clientes)
     notincache_df = clientes_df[clientes_df['STATUS'] == 'not in cache']
 
+    if not consulta_pendentes:
+        notincache_df = pd.concat([notincache_df, notincache_existente], ignore_index=True)
 
-    with pd.ExcelWriter('base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
+    notincache_df['CNPJ'] = notincache_df['CNPJ'].astype(str).str.zfill(14)
+
+    clientes_df = clientes_df.drop_duplicates()
+    notincache_df = notincache_df.drop_duplicates()
+
+    with pd.ExcelWriter('./base_cnpj.xlsx', mode='a', if_sheet_exists='replace') as writer:
         clientes_df.to_excel(writer, sheet_name='cnpjs', index=False)
         notincache_df.to_excel(writer, sheet_name='notincache', index=False)
 

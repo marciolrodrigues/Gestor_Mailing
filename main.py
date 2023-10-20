@@ -1,12 +1,12 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableWidgetItem
 from PySide6.QtCore import QDate
-from ui_main import Ui_MainWindow
-from utils import calcula_tempo, consulta_planilha, atualiza_planilha, atualiza_jucesp, formatar_moeda_data
-from jucesp import extrair_nires
-from database import DataBase
-from ui_functions import extrair_clientes
 from winotify import Notification
 from time import sleep
+from utils.ui_main import Ui_MainWindow
+from utils.utils import calcula_tempo, consulta_planilha, atualiza_planilha, atualiza_jucesp, formatar_moeda_data
+from automations.jucesp import extrair_nires
+from automations.ui_functions import extrair_clientes
+from database import DataBase
 import pandas as pd
 import sys
 import datetime
@@ -32,7 +32,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.txt_tempo.setStyleSheet('color: white;')
 
         data_atual = datetime.datetime.now()
-        data_limite = datetime.datetime(2023, 9, 30)
+        data_limite = datetime.datetime(2023, 10, 30)
         if data_atual <= data_limite:
             pass
         else:
@@ -84,6 +84,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         db.close_connection()
         self.tb_clientes.resizeColumnsToContents()
+
+        self.ordenar_por_data()
 
     def cadastrar_empresas(self, lista_cadastro):
         self.statusbar.showMessage('Conectando ao banco de dados...')
@@ -170,6 +172,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def extracao(self):
         self.tab_principal.setCurrentIndex(0)
         lista_cnpj, resultado_final = consulta_planilha(self.ch_box_pendentes.isChecked())
+
+        ok_antes = 0
+        for sublista in resultado_final:
+            ok_antes += sublista.count('OK')
+
         if lista_cnpj == 'sem_coluna':
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
@@ -232,7 +239,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     resultado_final = resultado_final + resultado_extracao
                     for empresa in lista_extraida:
                         self.cadastrar_empresas(empresa)
-                    atualiza_planilha(resultado_final)
+                    atualiza_planilha(resultado_final, self.ch_box_pendentes.isChecked())
 
                     if contador < qtde_cnpjs:
                         self.statusbar.showMessage('Aguardando para efetuar a próxima consulta')
@@ -257,10 +264,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                f'{notinchache} não estavam na base e\n'
                                f'{invalidos} CNPJs inválidos')
         self.statusbar.showMessage('Pronto!')
+        sublista = []
+
         notificacao = Notification(app_id='Gestor de Mailing', title='Processo finalizado!',
-                                   msg=f'Foram extraídos {resultado_final.count("OK")} CNPJs com sucesso, '
-                                       f'{sublista.count("not in cache")} não estavam na base e '
-                                       f'{sublista.count("CNPJ inválido")} CNPJs inválidos')
+                                   msg=f'Foram extraídos {ok - ok_antes} CNPJs com sucesso, '
+                                       f'{notinchache} não estavam na base e '
+                                       f'{invalidos} CNPJs inválidos')
         notificacao.show()
 
     def contagem(self):
@@ -295,6 +304,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.buscar_empresas()
 
         db.close_connection()
+
+    def ordenar_por_data(self):
+        # Converter as datas em objetos QDate para classificação
+        rows = self.tb_clientes.rowCount()
+        data_column = 0  # Coluna de datas
+        data_items = []
+
+        for row in range(rows):
+            data_item = self.tb_clientes.item(row, data_column)
+            if data_item is not None:
+                data = data_item.text()
+                data = QDate.fromString(data, 'dd/MM/yyyy')
+                data_items.append((row, data))
+
+        # Classificar os itens por data
+        data_items.sort(key=lambda x: x[1], reverse=True)
+
+        # Atualizar a tabela com os itens ordenados
+        for index, (row, data) in enumerate(data_items):
+            self.tb_clientes.insertRow(index + rows)
+            for column in range(self.tb_clientes.columnCount()):
+                item = self.tb_clientes.takeItem(row, column)
+                self.tb_clientes.setItem(index + rows, column, item)
+
+        # remover as linhas em branco
+        for row in range(rows):
+            self.tb_clientes.removeRow(0)
 
 
 if __name__ == '__main__':

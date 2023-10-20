@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 from time import sleep
 from winotify import Notification
 
-
 notificacao = Notification(app_id='Gestor de Mailing', title='Digitação do CAPTCHA',
                            msg='Digite o CAPTCHA no navegador para continuar a extração')
 
@@ -42,7 +41,6 @@ def consulta_jucesp(driver, lista_nires):
 
 
 def extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max):
-
     # entrar em https://www.jucesponline.sp.gov.br/BuscaAvancada.aspx?IDProduto=
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--start-maximized")
@@ -118,13 +116,13 @@ def extrair_nires(data_inicio, data_final, cidade, capital_min, capital_max):
         while True:
             try:
                 pagina_antes = driver.find_element(By.XPATH,
-                                           '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
+                                                   '//*[@id="ctl00_cphContent_gdvResultadoBusca_ifbGridView_lblLastDoc"]').text
                 break
             except:
                 sleep(1)
 
         # se tem outra página, clica no próximo e recupera a lista de intens
-        if tem_proxima_pagina: #TODO tem que rever isso aqui
+        if tem_proxima_pagina:
             while True:
                 try:
                     botao_proxima_pagina.click()
@@ -158,6 +156,7 @@ def pega_nires(driver):
         except:
             sleep(1)
     return nires
+
 
 if __name__ == '__main__':
     inicio = '21/09/2023'
